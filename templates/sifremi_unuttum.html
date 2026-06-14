@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gücünü Yaz - Şifremi Unuttum</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { 
+            background-color: #0a0a0a; 
+            color: white; 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh;
+        }
+        
+        .kurtarma-kutu { 
+            background: rgba(15, 15, 15, 0.95); 
+            padding: 40px; 
+            border-radius: 12px; 
+            border-top: 4px solid #e50914; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: center;
+        }
+        
+        .baslik { font-size: 2rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; }
+        .baslik span { color: #e50914; }
+        .aciklama { color: #888; font-size: 0.9rem; margin-bottom: 25px; }
+        
+        .form-grup { margin-bottom: 20px; text-align: left; }
+        .form-grup label { display: block; color: #aaa; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
+        .form-grup input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; font-family: 'Poppins'; font-size: 1rem; }
+        .form-grup input:focus { outline: none; border-color: #e50914; }
+        
+        .btn-kurtar { width: 100%; background: #e50914; color: white; padding: 14px; border: none; border-radius: 6px; font-size: 1.05rem; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;}
+        .btn-kurtar:hover { background: #b80710; transform: translateY(-2px); }
+        
+        .geri-don { display: block; margin-top: 20px; color: #888; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+        .geri-don:hover { color: white; }
+        
+        .hata-mesaji { background: rgba(229, 9, 20, 0.1); border: 1px solid #e50914; color: #e50914; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="kurtarma-kutu">
+        <div class="baslik">Şifreni <span>Kurtar</span></div>
+        <div class="aciklama">Sisteme kayıtlı e-posta adresini ve yeni şifreni gir.</div>
+        
+        {% if hata %}
+            <div class="hata-mesaji">{{ hata }}</div>
+        {% endif %}
+
+        <form action="/sifremi_unuttum" method="POST">
+            <div class="form-grup">
+                <label>E-posta Adresin</label>
+                <input type="email" name="eposta" required autocomplete="off" placeholder="Örn: ornek@mail.com">
+            </div>
+            
+            <div class="form-grup">
+                <label>Yeni Şifre</label>
+                <input type="password" name="yeni_sifre" required placeholder="Yeni şifreni belirle">
+            </div>
+            
+            <button type="submit" class="btn-kurtar">Şifreyi Güncelle</button>
+        </form>
+        
+        <a href="{{ url_for('ana_sayfa') }}" class="geri-don">← Giriş Sayfasına Dön</a>
+    </div>
+
+</body>
+</html>

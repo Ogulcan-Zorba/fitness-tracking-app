@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Giriş Yap</title>
+</head>
+<body>
+    <h2>Hesabına Giriş Yap</h2>
+    
+    <form action="/giris" method="POST">
+        <label for="eposta">E-posta Adresin:</label><br>
+        <input type="email" id="eposta" name="eposta" required><br><br>
+        
+        <label for="sifre">Şifren:</label><br>
+        <input type="password" id="sifre" name="sifre" required><br>
+        
+        <div style="margin-top: 5px; margin-bottom: 15px;">
+            <a href="/sifremi_unuttum" style="font-size: 0.9rem; color: #555; text-decoration: none;">Şifremi Unuttum?</a>
+        </div>
+        
+        <input type="submit" value="Giriş Yap">
+    </form>
+    <br>
+    <a href="/kayit">Henüz hesabın yok mu? Kayıt Ol</a>
+</body>
+</html>

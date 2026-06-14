@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gücünü Yaz - Profil Merkezi</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body { background-color: #0a0a0a; color: white; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .hamburger-btn { font-size: 2.2rem; color: white; cursor: pointer; transition: 0.3s; margin-right: 20px; user-select: none; display: flex; align-items: center;}
+        .hamburger-btn:hover { color: #e50914; text-shadow: 0 0 10px rgba(229,9,20,0.5); }
+        .yan-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background-color: #0d0d0d; border-right: 2px solid #e50914; transition: 0.4s; z-index: 1001; display: flex; flex-direction: column; padding-top: 80px; }
+        .yan-menu.acik { left: 0; }
+        .yan-menu a { color: #ccc; text-decoration: none; font-size: 1.15rem; padding: 18px 30px; border-bottom: 1px solid #222; transition: 0.3s; font-weight: 500; display: flex; align-items: center; gap: 15px;}
+        .yan-menu a:hover { background-color: rgba(229,9,20,0.15); color: white; padding-left: 40px; border-left: 4px solid #e50914; }
+        .menu-arkaplan { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .menu-arkaplan.acik { opacity: 1; visibility: visible; }
+        
+        .profil-container { max-width: 1000px; margin: 120px auto 50px auto; padding: 0 20px; }
+        .profil-baslik { font-size: 2.5rem; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; }
+        .profil-baslik span { color: #e50914; }
+        
+        .kart { background: rgba(15, 15, 15, 0.95); border-radius: 12px; padding: 30px; border-top: 4px solid #e50914; box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px; }
+        
+        .form-grup { margin-bottom: 20px; }
+        .form-grup label { display: block; color: #aaa; margin-bottom: 8px; font-weight: bold; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;}
+        .form-grup input, .form-grup select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; font-size: 1rem; box-sizing: border-box; transition: 0.3s; font-family: 'Poppins', sans-serif;}
+        .form-grup input:focus, .form-grup select:focus { outline: none; border-color: #e50914; box-shadow: 0 0 15px rgba(229,9,20,0.3); }
+        
+        .kaydet-btn { width: 100%; background: #e50914; color: white; padding: 15px; border: none; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 2px;}
+        .kaydet-btn:hover { background: #b80710; transform: translateY(-2px); }
+
+        .vki-alani { display: flex; align-items: center; justify-content: space-between; background: #111; padding: 20px; border-radius: 8px; border-left: 5px solid #333; margin-top: 20px; transition: 0.3s; }
+        
+        .makro-kutusu { background: #111; border: 1px solid #333; padding: 15px; border-radius: 8px; text-align: center; flex: 1; min-width: 120px; }
+        .makro-deger { font-size: 1.8rem; font-weight: 900; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="menu-arkaplan" id="menuArkaplan"></div>
+    <div class="yan-menu" id="yanMenu">
+        <div style="padding: 0 30px 20px 30px; margin-bottom: 10px; border-bottom: 2px dashed #333;">
+            <p style="color: #666; font-size: 0.9rem; margin: 0; text-transform: uppercase; font-weight: bold;">Menü</p>
+        </div>
+        <a href="/">🏠 Ana Panel</a>
+        <a href="/gecmis">🕒 Geçmiş Antrenmanlarım</a>
+        <a href="/rehber">📚 Hareket Rehberi</a>
+        <a href="/profil" style="background-color: rgba(229,9,20,0.15); color: white; border-left: 4px solid #e50914;">👤 Profilim</a>
+        <div style="margin-top: auto; border-top: 1px solid #333;">
+            <a href="/cikis" style="color: #e50914;">🚪 Güvenli Çıkış</a>
+        </div>
+    </div>
+
+    <nav style="position: absolute; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.85); border-bottom: 2px solid #e50914; z-index: 100;">
+        <div style="display: flex; align-items: center;">
+            <div class="hamburger-btn" id="hamburgerBtn">&#9776;</div>
+            <a href="/" style="display: flex; align-items: center; font-size: 1.8rem; font-weight: 800; color: white; text-decoration: none;">
+                GÜCÜNÜ <span style="color: #e50914; margin-left: 6px;">YAZ</span>
+            </a>
+        </div>
+    </nav>
+
+    <div class="profil-container">
+        <h1 class="profil-baslik">Komuta <span>Merkezi</span></h1>
+        
+        <div class="kart">
+            <form action="/profil" method="POST">
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div class="form-grup" style="flex: 1; min-width: 120px;">
+                        <label>Boy (CM)</label>
+                        <input type="number" name="boy" id="boyInput" value="{{ boy }}" required>
+                    </div>
+                    <div class="form-grup" style="flex: 1; min-width: 120px;">
+                        <label>Kilo (KG)</label>
+                        <input type="number" step="0.1" name="kilo" id="kiloInput" value="{{ kilo }}" required>
+                    </div>
+                    <div class="form-grup" style="flex: 1; min-width: 120px;">
+                        <label>Yaş</label>
+                        <input type="number" name="yas" id="yasInput" value="{{ yas }}" required>
+                    </div>
+                    <div class="form-grup" style="flex: 1; min-width: 120px;">
+                        <label>Cinsiyet</label>
+                        <select name="cinsiyet" id="cinsiyetInput">
+                            <option value="Erkek" {% if cinsiyet == "Erkek" %}selected{% endif %}>Erkek</option>
+                            <option value="Kadın" {% if cinsiyet == "Kadın" %}selected{% endif %}>Kadın</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="kaydet-btn">Veritabanını Güncelle</button>
+            </form>
+
+            <div class="vki-alani" id="vkiAlani">
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: 900; line-height: 1;" id="vkiDeger">00.0</div>
+                    <div style="color: #888; font-size: 0.9rem;">Vücut Kitle İndeksi</div>
+                </div>
+                <div class="vki-durum" id="vkiDurum" style="background: #333; color: white; padding: 8px 20px; border-radius: 20px;">Hesaplanıyor...</div>
+            </div>
+        </div>
+
+        <div class="kart">
+            <h2 style="color: #ccc; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 1.3rem;">Kardiyo & ACSM MET Analizörü</h2>
+            <p style="color: #888; font-size: 0.85rem; margin-bottom: 20px;">Kardiyo ekipmanındaki hız, eğim ve süre değerlerini girerek biyolojik kalori harcamanı (TDEE harici) anlık olarak görüntüle.</p>
+            
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                <div class="form-grup" style="flex: 1; min-width: 120px;">
+                    <label>Hız (KM/S)</label>
+                    <input type="number" step="0.1" id="kardiyoHiz" value="4.5">
+                </div>
+                <div class="form-grup" style="flex: 1; min-width: 120px;">
+                    <label>Eğim (%)</label>
+                    <input type="number" id="kardiyoEgim" value="15">
+                </div>
+                <div class="form-grup" style="flex: 1; min-width: 120px;">
+                    <label>Süre (Dakika)</label>
+                    <input type="number" id="kardiyoSure" value="30">
+                </div>
+            </div>
+
+            <div class="vki-alani" style="border-left-color: #3498db;">
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: 900; line-height: 1; color: #3498db;" id="yakilanKalori">0</div>
+                    <div style="color: #888; font-size: 0.9rem; margin-top: 5px;">Yakılan Saf Kalori (kcal)</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 1.8rem; font-weight: bold; color: white;" id="metDegeri">0.0</div>
+                    <div style="color: #888; font-size: 0.8rem; margin-top: 5px;">Hesaplanan MET</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="kart">
+            <h2 style="color: #ccc; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 1.3rem;">Günlük Bazal & Makro İhtiyacı</h2>
+            
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px;">
+                <div class="form-grup" style="flex: 1; min-width: 150px;">
+                    <label>Aktivite Seviyesi</label>
+                    <select id="aktiviteInput">
+                        <option value="1.2">Masa Başı / Hareketsiz</option>
+                        <option value="1.375">Hafif Aktif (Haftada 1-3 gün spor)</option>
+                        <option value="1.55" selected>Orta Aktif (Haftada 3-5 gün spor)</option>
+                        <option value="1.725">Çok Aktif (Haftada 6-7 gün spor)</option>
+                    </select>
+                </div>
+                <div class="form-grup" style="flex: 1; min-width: 150px;">
+                    <label>Hedef</label>
+                    <select id="hedefInput">
+                        <option value="cut">Yağ Yakımı (Definasyon)</option>
+                        <option value="maintain" selected>Kilo Koru</option>
+                        <option value="bulk">Kas Kazanımı (Bulk)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div class="makro-kutusu" style="border-top: 3px solid #f39c12;">
+                    <div style="color: #888; font-size: 0.8rem; text-transform: uppercase;">Günlük Kalori</div>
+                    <div class="makro-deger" id="kaloriSonuc">0</div>
+                    <div style="color: #666; font-size: 0.8rem;">kcal</div>
+                </div>
+                <div class="makro-kutusu" style="border-top: 3px solid #e74c3c;">
+                    <div style="color: #888; font-size: 0.8rem; text-transform: uppercase;">Protein</div>
+                    <div class="makro-deger" id="proteinSonuc">0</div>
+                    <div style="color: #666; font-size: 0.8rem;">gram</div>
+                </div>
+                <div class="makro-kutusu" style="border-top: 3px solid #3498db;">
+                    <div style="color: #888; font-size: 0.8rem; text-transform: uppercase;">Karbonhidrat</div>
+                    <div class="makro-deger" id="karbSonuc">0</div>
+                    <div style="color: #666; font-size: 0.8rem;">gram</div>
+                </div>
+                <div class="makro-kutusu" style="border-top: 3px solid #2ecc71;">
+                    <div style="color: #888; font-size: 0.8rem; text-transform: uppercase;">Sağlıklı Yağ</div>
+                    <div class="makro-deger" id="yagSonuc">0</div>
+                    <div style="color: #666; font-size: 0.8rem;">gram</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="kart">
+            <h2 style="color: #ccc; margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; font-size: 1.3rem;">Ağırlık Trendi</h2>
+            <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="kiloGrafigi"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- MENÜ ---
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const yanMenu = document.getElementById('yanMenu');
+        const menuArkaplan = document.getElementById('menuArkaplan');
+        hamburgerBtn.addEventListener('click', () => { yanMenu.classList.add('acik'); menuArkaplan.classList.add('acik'); });
+        menuArkaplan.addEventListener('click', () => { yanMenu.classList.remove('acik'); menuArkaplan.classList.remove('acik'); });
+
+        // --- VKİ MOTORU ---
+        function vkiHesapla() {
+            let boyGirdisi = document.getElementById('boyInput').value.replace(',', '.');
+            let kiloGirdisi = document.getElementById('kiloInput').value.replace(',', '.');
+            let boy = parseFloat(boyGirdisi);
+            let kilo = parseFloat(kiloGirdisi);
+            
+            if (boy > 3) { boy = boy / 100; }
+            
+            if (boy > 0 && kilo > 0) {
+                let vkiMetin = (kilo / (boy * boy)).toFixed(1);
+                let vkiSayi = parseFloat(vkiMetin);
+                document.getElementById('vkiDeger').innerText = vkiMetin;
+                
+                const vkiAlani = document.getElementById('vkiAlani');
+                const vkiDurum = document.getElementById('vkiDurum');
+                
+                if (vkiSayi < 18.5) {
+                    vkiDurum.innerText = "Zayıf"; vkiDurum.style.background = "#3498db"; vkiAlani.style.borderLeftColor = "#3498db";
+                } else if (vkiSayi >= 18.5 && vkiSayi < 25.0) {
+                    vkiDurum.innerText = "Normal"; vkiDurum.style.background = "#2ecc71"; vkiAlani.style.borderLeftColor = "#2ecc71";
+                } else if (vkiSayi >= 25.0 && vkiSayi < 30.0) {
+                    vkiDurum.innerText = "Fazla Kilolu"; vkiDurum.style.background = "#f39c12"; vkiAlani.style.borderLeftColor = "#f39c12";
+                } else {
+                    vkiDurum.innerText = "Obezite"; vkiDurum.style.background = "#e50914"; vkiAlani.style.borderLeftColor = "#e50914";
+                }
+                makroHesapla(boy * 100, kilo);
+                kardiyoHesapla(kilo); // Kilo değiştiğinde kardiyoyu da güncelle
+            }
+        }
+
+        // --- KARDİYO & ACSM MET MOTORU ---
+        function kardiyoHesapla(mevcutKilo) {
+            const hizKmh = parseFloat(document.getElementById('kardiyoHiz').value) || 0;
+            const egimYuzde = parseFloat(document.getElementById('kardiyoEgim').value) || 0;
+            const sureDk = parseFloat(document.getElementById('kardiyoSure').value) || 0;
+            
+            // Eğer kilo parametresi gelmediyse formdan al
+            let kilo = mevcutKilo;
+            if(!kilo) {
+                kilo = parseFloat(document.getElementById('kiloInput').value.replace(',', '.')) || 77;
+            }
+
+            // Hızı m/dk'ya çevir (1 km/s = 16.6667 m/dk)
+            const hizMdk = hizKmh * 16.6667;
+            const egimOndalik = egimYuzde / 100;
+
+            // ACSM Metabolik Hesaplama Formülü: Yürüme VO2
+            // VO2 = (0.1 * hiz) + (1.8 * hiz * egim) + 3.5 (Dinlenme)
+            let vo2 = (0.1 * hizMdk) + (1.8 * hizMdk * egimOndalik) + 3.5;
+            
+            // Hız 6.5 km/s üzerindeyse (Koşu) formül dinamik olarak değişir
+            if (hizKmh > 6.5) {
+                vo2 = (0.2 * hizMdk) + (0.9 * hizMdk * egimOndalik) + 3.5;
+            }
+
+            // 1 MET = 3.5 ml/kg/dk oksijen tüketimi
+            const met = vo2 / 3.5;
+
+            // Kalori Hesaplama: (MET * 3.5 * Ağırlık(kg) / 200) * Süre(dk)
+            const kaloriDk = (met * 3.5 * kilo) / 200;
+            const toplamKalori = kaloriDk * sureDk;
+
+            document.getElementById('metDegeri').innerText = met.toFixed(1);
+            document.getElementById('yakilanKalori').innerText = Math.round(toplamKalori);
+        }
+
+        // --- MAKRO VE KALORİ MOTORU ---
+        function makroHesapla(boyCm, kilo) {
+            const yas = parseInt(document.getElementById('yasInput').value) || 20;
+            const cinsiyet = document.getElementById('cinsiyetInput').value;
+            const aktivite = parseFloat(document.getElementById('aktiviteInput').value);
+            const hedef = document.getElementById('hedefInput').value;
+
+            // Mifflin-St Jeor Formülü
+            let bmh = (10 * kilo) + (6.25 * boyCm) - (5 * yas);
+            bmh = (cinsiyet === "Erkek") ? bmh + 5 : bmh - 161;
+
+            let tdee = bmh * aktivite;
+
+            if (hedef === "cut") tdee -= 500;
+            if (hedef === "bulk") tdee += 300;
+
+            const kalori = Math.round(tdee);
+            
+            const protein = Math.round(kilo * 2.2);
+            const yag = Math.round((kalori * 0.25) / 9);
+            const karb = Math.round((kalori - (protein * 4) - (yag * 9)) / 4);
+
+            document.getElementById('kaloriSonuc').innerText = kalori;
+            document.getElementById('proteinSonuc').innerText = protein;
+            document.getElementById('karbSonuc').innerText = karb;
+            document.getElementById('yagSonuc').innerText = yag;
+        }
+
+        // Sayfa yüklendiğinde ve formlar değiştiğinde tetikleyiciler
+        window.onload = () => {
+            vkiHesapla();
+            kardiyoHesapla();
+        };
+        
+        const inputs = ['boyInput', 'kiloInput', 'yasInput', 'aktiviteInput', 'hedefInput', 'cinsiyetInput'];
+        inputs.forEach(id => document.getElementById(id).addEventListener('input', vkiHesapla));
+        
+        const kardiyoInputs = ['kardiyoHiz', 'kardiyoEgim', 'kardiyoSure'];
+        kardiyoInputs.forEach(id => document.getElementById(id).addEventListener('input', () => kardiyoHesapla()));
+
+        // --- ÇİZGİ GRAFİK (Ağırlık) ---
+        const grafikTarihleri = JSON.parse('{{ tarihler | safe }}' || '[]');
+        const grafikKilolari = JSON.parse('{{ kilolar | safe }}' || '[]');
+
+        if (grafikTarihleri.length > 0) {
+            const ctx1 = document.getElementById('kiloGrafigi').getContext('2d');
+            const gradient = ctx1.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(229, 9, 20, 0.5)');
+            gradient.addColorStop(1, 'rgba(229, 9, 20, 0.0)');
+
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: grafikTarihleri,
+                    datasets: [{
+                        label: 'KG', data: grafikKilolari,
+                        borderColor: '#e50914', backgroundColor: gradient, borderWidth: 3,
+                        pointBackgroundColor: '#fff', pointBorderColor: '#e50914', fill: true, tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
+            });
+        }
+    </script>
+</body>
+</html>

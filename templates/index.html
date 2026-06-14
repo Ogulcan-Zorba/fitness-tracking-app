@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gücünü Yaz - Hoş Geldin</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g transform='rotate(-30 50 50)'><rect x='25' y='44' width='50' height='12' fill='%23cccccc' rx='2'/><rect x='15' y='25' width='12' height='50' fill='%23e50914' rx='3'/><rect x='5' y='32' width='8' height='36' fill='%23b80710' rx='2'/><rect x='73' y='25' width='12' height='50' fill='%23e50914' rx='3'/><rect x='87' y='32' width='8' height='36' fill='%23b80710' rx='2'/></g></svg>">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        /* 1. EFSANE ÇÖZÜM: Arka planı tek bir bölge yerine TÜM SİTEYE (body) yaydık ve sabitledik */
+        body { 
+            color: white; 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            overflow-x: hidden; 
+            
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.70)), url('https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed !important;
+            background-size: cover !important;
+        }
+
+        /* NAVBAR */
+        nav { position: fixed; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.85); border-bottom: 2px solid #e50914; z-index: 100; backdrop-filter: blur(5px); }
+        .btn-sag-ust { text-decoration: none; font-weight: bold; padding: 8px 20px; border-radius: 5px; transition: 0.3s; font-size: 0.95rem; margin-left: 10px; }
+        .btn-giris { color: #ccc; border: 1px solid #777; background: rgba(255,255,255,0.05); }
+        .btn-giris:hover { background: #ccc; color: black; border-color: #ccc; }
+        .btn-uyeol { color: white; border: 1px solid #e50914; background: rgba(229,9,20,0.1); }
+        .btn-uyeol:hover { background: #e50914; color: white; }
+
+        /* 2. HERO SECTION: Sadece yazıları ortalamak için kullanıyoruz, arka planı sildik */
+        .hero-section {
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .hero-baslik { font-size: 4rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+        .hero-baslik span { color: #e50914; }
+        .hero-aciklama { font-size: 1.2rem; color: #ccc; max-width: 700px; line-height: 1.8; margin-bottom: 40px; }
+
+        /* 3. FORM ALANI: Keskin çizgiyi yaratan siyah rengi (background-color) tamamen şeffaf yaptık */
+        .form-section { 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 100px 20px; 
+            background: transparent; 
+        }
+        
+        .form-container { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 900px; }
+        
+        /* 4. PREMIUM SOFT GEÇİŞ AYARI */
+        .animasyonlu { 
+            opacity: 0; 
+            transform: translateY(80px); /* Başlangıçta daha aşağıda başlasın */
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1); /* Daha yumuşak geçiş */
+        }
+        .animasyonlu.goster { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+
+        .form-kutusu { background: rgba(15, 15, 15, 0.95); padding: 40px; border-radius: 12px; border-top: 5px solid #e50914; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); text-align: center; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 12px; margin-bottom: 20px; border: 2px solid #333; border-radius: 6px; background: rgba(0,0,0,0.6); color: white; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        input[type="submit"] { background: #e50914; color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 1.1rem; }
+        input[type="submit"]:hover { background: #b80710; }
+    </style>
+</head>
+<body>
+
+    <nav style="position: absolute; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.85); border-bottom: 2px solid #e50914; z-index: 100; backdrop-filter: blur(5px);">
+        
+        <div style="display: flex; align-items: center;">
+            <div class="hamburger-btn" id="hamburgerBtn">&#9776;</div>
+            
+            <a href="/" style="display: flex; align-items: center; font-size: 1.8rem; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="45" height="45" style="margin-right: 12px;">
+                    <g transform="rotate(-30 50 50)">
+                        <rect x="25" y="44" width="50" height="12" fill="#cccccc" rx="2"/>
+                        <rect x="15" y="25" width="12" height="50" fill="#e50914" rx="3"/>
+                        <rect x="5" y="32" width="8" height="36" fill="#b80710" rx="2"/>
+                        <rect x="73" y="25" width="12" height="50" fill="#e50914" rx="3"/>
+                        <rect x="87" y="32" width="8" height="36" fill="#b80710" rx="2"/>
+                    </g>
+                </svg>
+                GÜCÜNÜ <span style="color: #e50914; margin-left: 6px;">YAZ</span>
+            </a>
+        </div>
+
+        <div>
+            <a href="/cikis" style="color: #e50914; text-decoration: none; font-weight: bold; border: 1px solid #e50914; padding: 8px 16px; border-radius: 5px; transition: 0.3s; font-family: 'Poppins', sans-serif;" onmouseover="this.style.backgroundColor='#e50914'; this.style.color='white';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#e50914';">Çıkış</a>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <h1 class="hero-baslik">Sınırlarını <span>Yok Et</span></h1>
+        <p class="hero-aciklama">Sıradan bir antrenman günlüğü değil; kan, ter ve demirle inşa edilmiş bir kontrol merkezi. Gelişimini anlık takip et, rekorlarını kır ve geçmişte kaldırdığın ağırlıkları kontrol ederek ilerle.</p>
+    </section>
+
+    <section class="form-section" id="form-alani">
+        <div class="form-container">
+            
+            <div class="form-kutusu animasyonlu">
+                <h2 style="margin-top: 0;">Tekrar Hoş Geldin</h2>
+                <p style="color: #888; margin-bottom: 25px;">Kaldığın yerden devam et.</p>
+                <form action="/login" method="POST">
+                    <input type="email" name="eposta" placeholder="E-posta Adresi" required>
+                    <input type="password" name="sifre" placeholder="Şifre" required>
+                    <div style="text-align: right; margin-top: 8px; margin-bottom: 15px; width: 100%;">
+    <a href="/sifremi_unuttum" style="color: #888; font-size: 0.85rem; text-decoration: none; transition: 0.3s; font-family: 'Poppins', sans-serif;" onmouseover="this.style.color='#e50914'" onmouseout="this.style.color='#888'">Şifremi unuttum</a>
+</div>
+                    <input type="submit" value="GİRİŞ YAP">
+                </form>
+            </div>
+
+            <div class="form-kutusu animasyonlu" style="border-top-color: #ccc; transition-delay: 0.2s;">
+                <h2 style="margin-top: 0;">Sınırları Aş</h2>
+                <p style="color: #888; margin-bottom: 25px;">Demirle tanışmak için ilk adımı at.</p>
+                <form action="/register" method="POST">
+                    <input type="email" name="eposta" placeholder="E-posta Adresini Gir" required>
+                    <input type="password" name="sifre" placeholder="Güçlü Bir Şifre" required>
+                    <input type="submit" value="ÜYE OL VE BAŞLA" style="background: #ccc; color: black;">
+                </form>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Ekranda görünüp görünmediğini takip eden gözlemci
+            const gozlemci = new IntersectionObserver((isimler) => {
+                isimler.forEach((isim) => {
+                    // Eğer kutu ekrana girdiyse:
+                    if (isim.isIntersecting) {
+                        isim.target.classList.add('goster');
+                    } 
+                    // YENİ EK: Eğer kutu ekrandan çıktıysa (yukarı kaydırdıysan):
+                    else {
+                        isim.target.classList.remove('goster');
+                    }
+                });
+            }, { threshold: 0.1 }); // %10'u ekrana girdiğinde/çıktığında tetikle
+
+            // Animasyonlu sınıfına sahip her şeyi gözlemle
+            const kutular = document.querySelectorAll('.animasyonlu');
+            kutular.forEach((kutu) => {
+                gozlemci.observe(kutu);
+            });
+        });
+    </script>
+</body>
+</html>

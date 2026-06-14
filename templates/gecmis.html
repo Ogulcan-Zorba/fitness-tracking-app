@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gücünü Yaz - Geçmiş Antrenmanlarım</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body { background-color: #0a0a0a; color: white; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+        
+        .hamburger-btn { font-size: 2.2rem; color: white; cursor: pointer; transition: 0.3s; margin-right: 20px; user-select: none; display: flex; align-items: center;}
+        .hamburger-btn:hover { color: #e50914; text-shadow: 0 0 10px rgba(229,9,20,0.5); }
+        .yan-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background-color: #0d0d0d; border-right: 2px solid #e50914; transition: 0.4s; z-index: 1001; display: flex; flex-direction: column; padding-top: 80px; }
+        .yan-menu.acik { left: 0; }
+        .yan-menu a { color: #ccc; text-decoration: none; font-size: 1.15rem; padding: 18px 30px; border-bottom: 1px solid #222; transition: 0.3s; font-weight: 500; display: flex; align-items: center; gap: 15px;}
+        .yan-menu a:hover { background-color: rgba(229,9,20,0.15); color: white; padding-left: 40px; border-left: 4px solid #e50914; }
+        .menu-arkaplan { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .menu-arkaplan.acik { opacity: 1; visibility: visible; }
+        
+        .gecmis-container { max-width: 1100px; margin: 120px auto 50px auto; padding: 0 20px; }
+        .gecmis-baslik { font-size: 2.5rem; margin-bottom: 30px; font-weight: 900; text-transform: uppercase; text-align: center; border-bottom: 2px solid #333; padding-bottom: 15px; }
+        .gecmis-baslik span { color: #e50914; }
+        
+        .kart { background: rgba(15, 15, 15, 0.95); border-radius: 12px; padding: 30px; border-top: 4px solid #e50914; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow-x: auto; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 700px; }
+        th { background-color: #e50914; color: white; padding: 15px; text-align: left; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 15px; border-bottom: 1px solid #333; color: #ccc; font-size: 1.05rem; vertical-align: middle; }
+        tr:hover td { background-color: rgba(229, 9, 20, 0.05); color: white; }
+        
+        /* DÜZENLE VE SİL BUTON STİLLERİ */
+        .btn-aksiyon { padding: 6px 14px; border: none; border-radius: 4px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: 0.2s; text-transform: uppercase; text-decoration: none; display: inline-block;}
+        .btn-duzenle { background: #f39c12; color: black; margin-right: 5px; }
+        .btn-duzenle:hover { background: #d38409; transform: translateY(-1px); }
+        .btn-sil { background: #c0392b; color: white; }
+        .btn-sil:hover { background: #962d22; transform: translateY(-1px); }
+
+        /* AÇILIR PENCERE (MODAL) STİLLERİ */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .modal.aktif { opacity: 1; visibility: visible; }
+        .modal-icerik { background: #0d0d0d; border-top: 4px solid #f39c12; padding: 30px; border-radius: 8px; width: 100%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,1); position: relative; }
+        .modal-kapat { position: absolute; top: 15px; right: 20px; color: #666; font-size: 1.8rem; cursor: pointer; transition: 0.3s; }
+        .modal-kapat:hover { color: #e50914; }
+        
+        .form-grup { margin-bottom: 15px; }
+        .form-grup label { display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase; font-weight: bold;}
+        .form-grup input { width: 100%; padding: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 4px; box-sizing: border-box; font-family: 'Poppins';}
+        .form-grup input:focus { outline: none; border-color: #f39c12; }
+        .guncelle-btn { width: 100%; background: #f39c12; color: black; padding: 12px; border: none; border-radius: 4px; font-size: 1rem; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px;}
+        .guncelle-btn:hover { background: #d38409; }
+    </style>
+</head>
+<body>
+
+    <div class="menu-arkaplan" id="menuArkaplan"></div>
+    <div class="yan-menu" id="yanMenu">
+        <div style="padding: 0 30px 20px 30px; margin-bottom: 10px; border-bottom: 2px dashed #333;">
+            <p style="color: #666; font-size: 0.9rem; margin: 0; text-transform: uppercase; font-weight: bold;">Menü</p>
+        </div>
+        <a href="/">🏠 Ana Sayfa</a>
+        <a href="/gecmis" style="background-color: rgba(229,9,20,0.15); color: white; border-left: 4px solid #e50914;">🕒 Geçmiş Antrenmanlarım</a>
+        <a href="/rehber">📚 Hareket Rehberi</a>
+        <a href="/profil">👤 Profilim</a>
+        <div style="margin-top: auto; border-top: 1px solid #333;">
+            <a href="/cikis" style="color: #e50914;">🚪 Güvenli Çıkış</a>
+        </div>
+    </div>
+
+    <nav style="position: absolute; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.85); border-bottom: 2px solid #e50914; z-index: 100;">
+        <div style="display: flex; align-items: center;">
+            <div class="hamburger-btn" id="hamburgerBtn">&#9776;</div>
+            <a href="/" style="display: flex; align-items: center; font-size: 1.8rem; font-weight: 800; color: white; text-decoration: none;">
+                GÜCÜNÜ <span style="color: #e50914; margin-left: 6px;">YAZ</span>
+            </a>
+        </div>
+        <div>
+            <a href="/cikis" style="color: #e50914; text-decoration: none; font-weight: bold; border: 1px solid #e50914; padding: 8px 16px; border-radius: 5px; transition: 0.3s;">Çıkış</a>
+        </div>
+    </nav>
+
+    <div class="gecmis-container">
+        <h1 class="gecmis-baslik">Antrenman <span>Geçmişim</span></h1>
+        
+        <div class="kart">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tarih</th>
+                        <th>Hareket Adı</th>
+                        <th>Set</th>
+                        <th>Tekrar</th>
+                        <th>Ağırlık (KG)</th>
+                        <th style="width: 180px;">Aksiyonlar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for antrenman in antrenmanlar %}
+                    <tr>
+                        <td>{{ antrenman[5] }}</td>
+                        <td style="font-weight: bold; color: white;">{{ antrenman[1] }}</td>
+                        <td>{{ antrenman[2] }}</td>
+                        <td>{{ antrenman[3] }}</td>
+                        <td style="color: #e50914; font-weight: bold;">{{ antrenman[4] }} KG</td>
+                        <td>
+                            <div style="display: flex;">
+                                <button class="btn-aksiyon btn-duzenle" onclick="modalAc('{{ antrenman[0] }}', '{{ antrenman[1] }}', '{{ antrenman[2] }}', '{{ antrenman[3] }}', '{{ antrenman[4] }}', '{{ antrenman[5] }}')">Düzenle</button>
+                                
+                                <form action="/antrenman_sil/{{ antrenman[0] }}" method="POST" onsubmit="return confirm('Bu antrenman kaydını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.');" style="margin:0;">
+                                    <button type="submit" class="btn-aksiyon btn-sil">Sil</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #888; font-style: italic;">
+                            Henüz sisteme kaydedilmiş bir antrenman bulunmuyor.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal" id="duzenleModal">
+        <div class="modal-icerik">
+            <span class="modal-kapat" id="modalKapatBtn">&times;</span>
+            <h2 style="color: #f39c12; margin-top: 0; font-size: 1.4rem; border-bottom: 1px solid #222; padding-bottom: 10px; text-transform: uppercase;" id="modalBaslik">Antrenmanı Düzenle</h2>
+            
+            <form action="/antrenman_duzenle" method="POST">
+                <input type="hidden" name="id" id="modalId">
+                
+                <div class="form-grup">
+                    <label>Tarih</label>
+                    <input type="text" name="tarih" id="modalTarih" required>
+                </div>
+                <div class="form-grup">
+                    <label>Set Sırası / No</label>
+                    <input type="number" name="set_sayisi" id="modalSet" required>
+                </div>
+                <div class="form-grup">
+                    <label>Tekrar Sayısı</label>
+                    <input type="number" name="tekrar_sayisi" id="modalTekrar" required>
+                </div>
+                <div class="form-grup">
+                    <label>Ağırlık (KG)</label>
+                    <input type="number" step="0.1" name="agirlik" id="modalAgirlik" required>
+                </div>
+                
+                <button type="submit" class="guncelle-btn">Değişiklikleri Kaydet</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // MENÜ ETKİLEŞİMİ
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const yanMenu = document.getElementById('yanMenu');
+        const menuArkaplan = document.getElementById('menuArkaplan');
+        hamburgerBtn.addEventListener('click', () => { yanMenu.classList.add('acik'); menuArkaplan.classList.add('acik'); });
+        menuArkaplan.addEventListener('click', () => { yanMenu.classList.remove('acik'); menuArkaplan.classList.remove('acik'); });
+
+        // MODAL ETKİLEŞİM MOTORU
+        const modal = document.getElementById('duzenleModal');
+        const modalKapatBtn = document.getElementById('modalKapatBtn');
+
+        function modalAc(id, ad, set, tekrar, agirlik, tarih) {
+            document.getElementById('modalId').value = id;
+            document.getElementById('modalBaslik').innerText = ad + " Düzenle";
+            document.getElementById('modalSet').value = set;
+            document.getElementById('modalTekrar').value = tekrar;
+            document.getElementById('modalAgirlik').value = agirlik;
+            document.getElementById('modalTarih').value = tarih;
+            
+            modal.classList.add('aktif');
+        }
+
+        modalKapatBtn.addEventListener('click', () => { modal.classList.remove('aktif'); });
+        window.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('aktif'); });
+    </script>
+</body>
+</html>

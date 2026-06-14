@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Hareketi Düzenle</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .admin-kutu { max-width: 600px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 5px solid #f39c12; }
+        h1 { color: #2c3e50; margin-bottom: 5px; }
+        input[type="text"], select { width: 100%; padding: 12px; margin: 8px 0 20px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        input[type="submit"] { background: #f39c12; color: white; border: none; padding: 14px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; font-size: 1.1rem; }
+        input[type="submit"]:hover { background: #e67e22; }
+        a { color: #3498db; text-decoration: none; font-weight: bold; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="admin-kutu">
+        <h1>✏️ Hareketi Düzenle</h1>
+        <a href="/admin">&larr; İptal Et ve Geri Dön</a>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <form action="/admin/duzenle/{{ hareket[0] }}" method="POST">
+            
+            <label style="font-weight: bold;">Hareketin Adı:</label>
+            <input type="text" name="hareket_adi" value="{{ hareket[1] }}" required>
+
+            <label style="font-weight: bold;">Çalıştırdığı Bölge:</label>
+            <select name="bolge" required>
+                <option value="Göğüs" {% if hareket[2] == 'Göğüs' %}selected{% endif %}>Göğüs</option>
+                <option value="Sırt" {% if hareket[2] == 'Sırt' %}selected{% endif %}>Sırt</option>
+                <option value="Omuz" {% if hareket[2] == 'Omuz' %}selected{% endif %}>Omuz</option>
+                <option value="Bacak" {% if hareket[2] == 'Bacak' %}selected{% endif %}>Bacak</option>
+                <option value="Ön Kol" {% if hareket[2] == 'Ön Kol' %}selected{% endif %}>Ön Kol</option>
+                <option value="Arka Kol" {% if hareket[2] == 'Arka Kol' %}selected{% endif %}>Arka Kol</option>
+                <option value="Bilek" {% if hareket[2] == 'Bilek' %}selected{% endif %}>Bilek</option>
+                <option value="Karın" {% if hareket[2] == 'Karın' %}selected{% endif %}>Karın</option>
+            </select>
+
+            <label style="font-weight: bold;">Video Dosya Adı:</label>
+            <input type="text" name="video_link" value="{{ hareket[3] }}" required>
+
+            <input type="submit" value="Değişiklikleri Kaydet">
+        </form>
+    </div>
+</body>
+</html>

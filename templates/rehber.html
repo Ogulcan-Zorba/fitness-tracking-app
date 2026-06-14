@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gücünü Yaz - Hareket Rehberi</title>
+    
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g transform='rotate(-30 50 50)'><rect x='25' y='44' width='50' height='12' fill='%23cccccc' rx='2'/><rect x='15' y='25' width='12' height='50' fill='%23e50914' rx='3'/><rect x='5' y='32' width='8' height='36' fill='%23b80710' rx='2'/><rect x='73' y='25' width='12' height='50' fill='%23e50914' rx='3'/><rect x='87' y='32' width='8' height='36' fill='%23b80710' rx='2'/></g></svg>">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        body { background-color: #0a0a0a; color: white; font-family: 'Poppins', sans-serif; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+
+        /* YAN MENÜ VE NAVBAR STİLLERİ */
+        .hamburger-btn { font-size: 2.2rem; color: white; cursor: pointer; transition: 0.3s; margin-right: 20px; user-select: none; line-height: 1; display: flex; align-items: center;}
+        .hamburger-btn:hover { color: #e50914; text-shadow: 0 0 10px rgba(229,9,20,0.5); }
+        .yan-menu { position: fixed; top: 0; left: -300px; width: 280px; height: 100vh; background-color: #0d0d0d; border-right: 2px solid #e50914; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1001; box-shadow: 5px 0 25px rgba(0,0,0,0.9); display: flex; flex-direction: column; padding-top: 80px; }
+        .yan-menu.acik { left: 0; }
+        .yan-menu a { color: #ccc; text-decoration: none; font-size: 1.15rem; padding: 18px 30px; border-bottom: 1px solid #222; transition: 0.3s; font-weight: 500; display: flex; align-items: center; gap: 15px;}
+        .yan-menu a:hover { background-color: rgba(229,9,20,0.15); color: white; padding-left: 40px; border-left: 4px solid #e50914; }
+        .menu-arkaplan { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s; }
+        .menu-arkaplan.acik { opacity: 1; visibility: visible; }
+        .kapat-btn { position: absolute; top: 15px; right: 20px; font-size: 2.5rem; color: #666; cursor: pointer; line-height: 1; transition: 0.3s; }
+        .kapat-btn:hover { color: #e50914; transform: rotate(90deg); }
+
+        /* ANA İÇERİK */
+        .rehber-container { max-width: 1100px; margin: 120px auto 50px auto; padding: 0 20px; text-align: center; }
+        .rehber-baslik { font-size: 3rem; margin-bottom: 10px; font-weight: 900; text-transform: uppercase; }
+        .rehber-baslik span { color: #e50914; }
+        .rehber-aciklama { color: #888; margin-bottom: 30px; font-size: 1.1rem; }
+
+        /* ARAMA VE FİLTRELEME ARAÇLARI */
+        .arama-kutusu { width: 100%; max-width: 600px; padding: 15px 20px; font-size: 1.1rem; border: 2px solid #333; border-radius: 8px; background: rgba(15,15,15,0.9); color: white; margin-bottom: 20px; font-family: 'Poppins', sans-serif; transition: 0.3s; box-sizing: border-box; }
+        .arama-kutusu:focus { outline: none; border-color: #e50914; box-shadow: 0 0 15px rgba(229,9,20,0.3); }
+        
+        .filtre-kapsayici { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 50px; }
+        .filtre-btn { background: rgba(255,255,255,0.05); border: 1px solid #444; color: #ccc; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: 0.3s; font-family: 'Poppins', sans-serif; }
+        .filtre-btn:hover { background: rgba(229,9,20,0.2); border-color: #e50914; color: white; }
+        .filtre-btn.aktif { background: #e50914; border-color: #e50914; color: white; box-shadow: 0 0 10px rgba(229,9,20,0.5); }
+
+        /* KART IZGARASI */
+        .kart-izgarasi { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; }
+        
+        .hareket-karti { background: rgba(15, 15, 15, 0.95); border-radius: 12px; padding: 25px 20px; border-top: 4px solid #333; position: relative; overflow: hidden; transition: all 0.3s ease; text-align: left; box-shadow: 0 5px 15px rgba(0,0,0,0.5); cursor: pointer; }
+        .hareket-karti:hover { transform: translateY(-5px); border-top-color: #e50914; box-shadow: 0 10px 25px rgba(229, 9, 20, 0.2); }
+
+        .bolge-etiketi { position: absolute; top: 15px; right: -30px; background: #e50914; color: white; padding: 4px 35px; transform: rotate(45deg); font-size: 0.7rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .hareket-adi { font-size: 1.2rem; color: white; margin-bottom: 0; font-weight: bold; }
+        .kart-tikla-bilgi { font-size: 0.8rem; color: #666; margin-top: 10px; font-style: italic; }
+
+        /* AÇILIR PENCERE (MODAL) STİLLERİ */
+        .modal-arkaplan { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .modal-arkaplan.acik { display: flex; }
+        .modal-kutu { background: #0d0d0d; width: 100%; max-width: 700px; padding: 35px 30px; border-radius: 12px; border-top: 5px solid #e50914; position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.9); text-align: left; animation: modalAcilis 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto; }
+        @keyframes modalAcilis { from { transform: scale(0.8) translateY(30px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        
+        .modal-kapat { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: #666; cursor: pointer; transition: 0.3s; line-height: 1; z-index: 10;}
+        .modal-kapat:hover { color: #e50914; transform: rotate(90deg); }
+        
+        .modal-bolge-etiket { display: inline-block; background: rgba(229,9,20,0.15); color: #e50914; padding: 5px 12px; border: 1px solid #e50914; border-radius: 4px; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; margin-bottom: 15px; }
+        .modal-baslik { font-size: 2rem; color: white; margin: 0 0 20px 0; font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 15px; }
+        .modal-detay { color: #ccc; font-size: 1rem; line-height: 1.7; margin-bottom: 20px; }
+        
+        /* Video Oynatıcı Çerçevesi */
+        .yerel-video-kutusu { width: 100%; border-radius: 8px; overflow: hidden; border: 2px solid #333; background-color: #000; }
+        .yerel-video-kutusu video { width: 100%; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="menu-arkaplan" id="menuArkaplan"></div>
+    <div class="yan-menu" id="yanMenu">
+        <span class="kapat-btn" id="kapatBtn">&times;</span>
+        <div style="padding: 0 30px 20px 30px; margin-bottom: 10px; border-bottom: 2px dashed #333;">
+            <p style="color: #666; font-size: 0.9rem; margin: 0; text-transform: uppercase; font-weight: bold;">Menü</p>
+        </div>
+        <a href="/">🏠 Ana Sayfa</a>
+        <a href="/gecmis">🕒 Geçmiş Antrenmanlarım</a>
+        <a href="/profil">👤 Profilim</a>
+        <a href="/rehber" style="background-color: rgba(229,9,20,0.15); color: white; border-left: 4px solid #e50914;">📚 Hareket Rehberi</a>
+        <div style="margin-top: auto; border-top: 1px solid #333;">
+            <a href="/cikis" style="color: #e50914;">🚪 Güvenli Çıkış</a>
+        </div>
+    </div>
+
+   <nav style="position: absolute; top: 0; left: 0; width: 100%; padding: 15px 25px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.85); border-bottom: 2px solid #e50914; z-index: 100; backdrop-filter: blur(5px);">
+        
+        <div style="display: flex; align-items: center;">
+            <div class="hamburger-btn" id="hamburgerBtn">&#9776;</div>
+            
+            <a href="/" style="display: flex; align-items: center; font-size: 1.8rem; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="45" height="45" style="margin-right: 12px;">
+                    <g transform="rotate(-30 50 50)">
+                        <rect x="25" y="44" width="50" height="12" fill="#cccccc" rx="2"/>
+                        <rect x="15" y="25" width="12" height="50" fill="#e50914" rx="3"/>
+                        <rect x="5" y="32" width="8" height="36" fill="#b80710" rx="2"/>
+                        <rect x="73" y="25" width="12" height="50" fill="#e50914" rx="3"/>
+                        <rect x="87" y="32" width="8" height="36" fill="#b80710" rx="2"/>
+                    </g>
+                </svg>
+                GÜCÜNÜ <span style="color: #e50914; margin-left: 6px;">YAZ</span>
+            </a>
+        </div>
+
+        <div>
+            <a href="/cikis" style="color: #e50914; text-decoration: none; font-weight: bold; border: 1px solid #e50914; padding: 8px 16px; border-radius: 5px; transition: 0.3s; font-family: 'Poppins', sans-serif;" onmouseover="this.style.backgroundColor='#e50914'; this.style.color='white';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#e50914';">Çıkış</a>
+        </div>
+    </nav>
+
+    <div class="rehber-container">
+        <h1 class="rehber-baslik">Demiri <span>Bükme</span> Rehberi</h1>
+        <p class="rehber-aciklama">Aradığın hareketi anında bul ve form videolarını izlemek için üzerine tıkla.</p>
+
+        <input type="text" id="aramaKutusu" class="arama-kutusu" placeholder="Hareket ara... (Örn: Bench Press)">
+        
+        <div class="filtre-kapsayici">
+            <button class="filtre-btn aktif" onclick="filtreleBolge('Tümü')">Tümü</button>
+            <button class="filtre-btn" onclick="filtreleBolge('Göğüs')">Göğüs</button>
+            <button class="filtre-btn" onclick="filtreleBolge('Sırt')">Sırt</button>
+            <button class="filtre-btn" onclick="filtreleBolge('Omuz')">Omuz</button>
+            <button class="filtre-btn" onclick="filtreleBolge('Bacak')">Bacak</button>
+            <button class="filtre-btn" onclick="filtreleBolge('Ön Kol')">Ön Kol</button>
+            <button class="filtre-btn" onclick="filtreleBolge('Arka Kol')">Arka Kol</button>
+            <button class="filtre-btn" onclick="filtreleBolge('Karın')">Karın</button>
+        </div>
+
+        {% if hareketler %}
+        <div class="kart-izgarasi" id="kartIzgarasi">
+            {% for h in hareketler %}
+            <div class="hareket-karti" data-bolge="{{ h[2] }}" onclick="modalAc('{{ h[1] }}', '{{ h[2] }}', '{{ h[3] }}')">
+                <div class="bolge-etiketi">{{ h[2] }}</div>
+                <div class="hareket-adi">{{ h[1] }}</div>
+                <div class="kart-tikla-bilgi">🎬 Videoyu izlemek için tıkla</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div id="bulunamadiUyari" style="display: none; margin-top: 30px; color: #888; font-style: italic;">
+            Aradığın kriterlere uygun bir hareket bulunamadı.
+        </div>
+        {% else %}
+        <div style="margin-top: 50px; padding: 30px; background: rgba(0,0,0,0.5); border: 1px dashed #e50914; border-radius: 8px;">
+            <h3 style="color: #ccc;">Veritabanında henüz hareket bulunmuyor.</h3>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="modal-arkaplan" id="hareketModal">
+        <div class="modal-kutu">
+            <span class="modal-kapat" onclick="modalKapat()">&times;</span>
+            <div class="modal-bolge-etiket" id="modalBolge">Bölge</div>
+            <h2 class="modal-baslik" id="modalBaslik">Hareket Adı</h2>
+            <div class="modal-detay" id="modalDetay">
+                Aşağıdaki eğitim videosundan hareketin teknik detaylarını inceleyebilirsin. Formu bozmadan yapabileceğin ağırlıkları tercih et.
+            </div>
+            
+            <div class="yerel-video-kutusu">
+    <video id="yerelVideo" controls style="width: 100%; display: none;">
+        Tarayıcınız video oynatmayı desteklemiyor.
+    </video>
+</div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. MENÜ SİSTEMİ ---
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const yanMenu = document.getElementById('yanMenu');
+        const menuArkaplan = document.getElementById('menuArkaplan');
+        const kapatBtn = document.getElementById('kapatBtn');
+
+        function menuyuAc() { yanMenu.classList.add('acik'); menuArkaplan.classList.add('acik'); }
+        function menuyuKapat() { yanMenu.classList.remove('acik'); menuArkaplan.classList.remove('acik'); }
+
+        hamburgerBtn.addEventListener('click', menuyuAc);
+        kapatBtn.addEventListener('click', menuyuKapat);
+        menuArkaplan.addEventListener('click', menuyuKapat); 
+
+        // --- 2. ARAMA VE FİLTRELEME MOTORU ---
+        const aramaKutusu = document.getElementById('aramaKutusu');
+        const kartlar = document.querySelectorAll('.hareket-karti');
+        const filtreButonlari = document.querySelectorAll('.filtre-btn');
+        const bulunamadiUyari = document.getElementById('bulunamadiUyari');
+        let aktifBolge = 'Tümü';
+
+        function filtreUygula() {
+            const aramaMetni = aramaKutusu.value.toLowerCase();
+            let gorunenKartSayisi = 0;
+
+            kartlar.forEach(kart => {
+                const ad = kart.querySelector('.hareket-adi').innerText.toLowerCase();
+                const bolge = kart.getAttribute('data-bolge');
+                
+                const metinUyumu = ad.includes(aramaMetni);
+                const bolgeUyumu = (aktifBolge === 'Tümü' || aktifBolge === bolge);
+
+                if (metinUyumu && bolgeUyumu) {
+                    kart.style.display = 'block';
+                    gorunenKartSayisi++;
+                } else {
+                    kart.style.display = 'none';
+                }
+            });
+
+            if (gorunenKartSayisi === 0 && kartlar.length > 0) {
+                bulunamadiUyari.style.display = 'block';
+            } else {
+                bulunamadiUyari.style.display = 'none';
+            }
+        }
+
+        aramaKutusu.addEventListener('input', filtreUygula);
+
+        function filtreleBolge(secilenBolge) {
+            aktifBolge = secilenBolge;
+            filtreButonlari.forEach(btn => {
+                btn.classList.remove('aktif');
+                if (btn.innerText === secilenBolge) {
+                    btn.classList.add('aktif');
+                }
+            });
+            filtreUygula();
+        }
+
+        // --- 3. AKILLI YEREL MP4 VİDEO MOTORU ---
+        const modal = document.getElementById('hareketModal');
+        const modalBaslik = document.getElementById('modalBaslik');
+        const modalBolge = document.getElementById('modalBolge');
+        const yerelVideo = document.getElementById('yerelVideo');
+
+        function modalAc(isim, bolge, videoDosyaAdi) {
+            modalBaslik.innerText = isim;
+            modalBolge.innerText = bolge;
+            
+            console.log("Veritabanından gelen veri: ", videoDosyaAdi);
+            
+            // Eğer video adı doluysa
+            if (videoDosyaAdi && videoDosyaAdi !== 'None' && videoDosyaAdi.trim() !== '') {
+                let dosya = videoDosyaAdi.trim();
+                
+                // .mp4 uzantısı yoksa otomatik ekle
+                if (!dosya.toLowerCase().endsWith('.mp4')) {
+                    dosya += '.mp4';
+                }
+                
+                yerelVideo.src = "/static/videos/" + dosya;
+                yerelVideo.style.display = "block";
+                
+                console.log("Tarayıcının yüklediği yol: ", yerelVideo.src);
+                yerelVideo.load(); 
+            } else {
+                console.log("HATA: Bu hareket için veritabanında video bulunamadı!");
+                yerelVideo.src = "";
+                yerelVideo.style.display = "none";
+            }
+            
+            modal.classList.add('acik');
+        }
+
+        function modalKapat() {
+            modal.classList.remove('acik');
+            yerelVideo.pause(); 
+            yerelVideo.src = ""; 
+        }
+
+        // Siyah arka plana tıklayınca kapatma
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modalKapat();
+            }
+        });
+    </script>
+</body>
+</html>

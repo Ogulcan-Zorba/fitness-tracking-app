@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yönetim Mutfağı</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
+        .admin-kutu { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1, h2 { color: #2c3e50; }
+        input[type="text"], select { width: 100%; padding: 12px; margin: 8px 0 20px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        input[type="submit"] { background: #3498db; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        input[type="submit"]:hover { background: #2980b9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #f8f9fa; color: #333; }
+        a { color: #3498db; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .btn-sil { color: #e74c3c; font-weight: bold; text-decoration: none; }
+        .btn-duzenle { color: #f39c12; font-weight: bold; text-decoration: none; margin-right: 15px; }
+        .btn-duzenle:hover { color: #e67e22; }
+    </style>
+</head>
+<body>
+    <div class="admin-kutu">
+        <h1>Yönetim Paneli</h1>
+        <p style="color: #7f8c8d;">Sisteme yeni egzersizler ekleyin veya mevcutları yönetin.</p>
+        <a href="/" style="font-weight: bold;">&larr; Ana Sayfaya Dön</a>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <form action="/admin" method="POST">
+            <label for="hareket_adi" style="font-weight: bold;">Hareketin İngilizce Adı:</label>
+            <input type="text" id="hareket_adi" name="hareket_adi" placeholder="Örn: Bench Press" required>
+
+            <label for="bolge" style="font-weight: bold;">Çalıştırdığı Bölge:</label>
+            <select id="bolge" name="bolge" required>
+                <option value="Göğüs">Göğüs</option>
+                <option value="Sırt">Sırt</option>
+                <option value="Omuz">Omuz</option>
+                <option value="Bacak">Bacak</option>
+                <option value="Ön Kol">Ön Kol</option>
+                <option value="Arka Kol">Arka Kol</option>
+                <option value="Bilek">Bilek</option>
+                <option value="Karın">Karın</option>
+            </select>
+
+            <label for="video_link" style="font-weight: bold;">Video Dosya Adı:</label>
+            <input type="text" id="video_link" name="video_link" placeholder="Örn: bench_press.mp4" required>
+
+            <input type="submit" value="+ Hareketi Sisteme Ekle">
+        </form>
+
+        <h2 style="margin-top: 40px;">Sistemdeki Egzersizler</h2>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Hareket Adı</th>
+                <th>Bölge</th>
+                <th>Video</th>
+                <th>İşlem</th>
+            </tr>
+            {% for h in hareketler %}
+            <tr>
+                <td>{{ h[0] }}</td>
+                <td>{{ h[1] }}</td>
+                <td>{{ h[2] }}</td>
+                <td><a href="{{ url_for('static', filename='videos/' + h[3]) }}" target="_blank">İzle</a></td>
+                <td>
+                    <a href="/admin/duzenle/{{ h[0] }}" class="btn-duzenle">✏️ Düzenle</a>
+                    <a href="/admin/sil/{{ h[0] }}" class="btn-sil">X Sil</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

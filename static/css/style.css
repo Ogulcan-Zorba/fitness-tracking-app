@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    /* Karanlık spor salonu görseli ve üzerine okunabilirliği artıran siyah gölge (overlay) */
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), 
+                url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed;
+    background-size: cover;
+    color: #ffffff; /* Ana metinler bembeyaz */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Sayfayı dikeyde de tam ortaya hizalar */
+    min-height: 100vh;
+}
+
+/* O beyaz kutuyu (çerçeveyi) tamamen yok ettik, sadece hizalama için şeffaf bir alan bıraktık */
+.container {
+    padding: 20px;
+    width: 90%;
+    max-width: 900px; /* Yazılar büyüdüğü için alanı genişlettik */
+    text-align: center; /* Yazılar tam ortada */
+}
+
+/* Dev Başlıklar */
+h1 {
+    font-size: 4rem; /* Başlığı devasa yaptık */
+    color: #ffffff;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    line-height: 1.1;
+}
+
+/* Başlığın içindeki vurgulu kelimeler için kırmızı renk */
+h1 span {
+    color: #e50914; /* Agresif kırmızı */
+}
+
+p {
+    font-size: 1.3rem; /* Açıklama yazısı büyütüldü */
+    color: #cccccc; /* Beyaza yakın açık gri, göz yormaz */
+    line-height: 1.8;
+    margin-bottom: 40px;
+}
+
+/* Kırmızı-Siyah Temalı Form Kutucukları */
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], select {
+    width: 100%;
+    padding: 16px;
+    margin: 10px 0 25px 0;
+    border: 2px solid #333;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 1.1rem;
+    transition: 0.3s;
+    box-sizing: border-box; /* Taşmayı engelleyen sihirli kod */
+}
+
+/* Kutucuğa tıklanınca kırmızı yanması */
+input:focus, select:focus {
+    outline: none;
+    border-color: #e50914;
+    box-shadow: 0 0 10px rgba(229, 9, 20, 0.5);
+}
+
+/* Agresif Buton Stili (Kırmızı) */
+input[type="submit"], .btn {
+    background-color: #e50914;
+    color: white;
+    padding: 15px 40px; /* Butonlar büyütüldü */
+    border: 2px solid #e50914;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 800;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-transform: uppercase; /* Harfler büyük */
+    letter-spacing: 1px;
+}
+
+/* Butonun Üzerine Gelince (İçi boşalır, kırmızı çizgi kalır) */
+input[type="submit"]:hover, .btn:hover {
+    background-color: transparent;
+    color: #e50914;
+    transform: scale(1.05); /* Havaya kalkmak yerine hafifçe şişer (Büyür) */
+}
+
+/* Alternatif Buton (Kayıt Ol gibi ikincil butonlar için Beyaz-Şeffaf) */
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+}
+
+.btn-outline:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* Linkler */
+a {
+    color: #e50914;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+a:hover {
+    color: #ffffff;
+}
+
+/* Admin tablosunu karanlık temaya uydurma */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: rgba(0, 0, 0, 0.8); /* Siyah arka plan */
+    border-radius: 5px;
+    overflow: hidden;
+    color: white;
+}
+
+th, td {
+    padding: 15px;
+    border-bottom: 1px solid #333; /* Koyu gri ayraçlar */
+    text-align: left;
+}
+
+th {
+    background-color: #e50914; /* Başlıklar kırmızı */
+    color: white;
+}
+
+/* Sayı kutularındaki çirkin ok işaretlerini (spinners) gizleme */
+input[type="number"]::-webkit-inner-spin-button, 
+input[type="number"]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+/* Firefox tarayıcısı için ek düzeltme */
+input[type="number"] { 
+    -moz-appearance: textfield; 
+}
