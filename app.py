@@ -1,4 +1,5 @@
 import sqlite3
+import config
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -43,8 +44,8 @@ def login():
         session["kullanici_id"] = kullanici[0]
         
         # 👑 E-POSTA KONTROLÜ İLE KESİN ADMİNLİK
-        # Aşağıdaki e-posta adresini, sitede üye olurken kullandığın e-posta ile değiştir!
-        if eposta == "ogulcanzorba14@gmail.com":
+        
+        if eposta == config.ADMIN_EPOSTA:
             session["kullanici_rol"] = "admin"
         else:
             session["kullanici_rol"] = "kullanici"
